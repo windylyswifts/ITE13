@@ -76,11 +76,24 @@ int main() {
     printf("\n");
     
     // PART 3: Calculate remaining inventory after the week
-    int remaining[5];
+    int remaining[5]= {0};
     
     // TODO: Calculate remaining inventory = starting inventory - total sales
     // If remaining goes negative, set it to 0 (can't have negative inventory)
     
+    for (int i = 0; i < 7; i++){
+        inventory[0] -= daily_sales[i][0];
+        inventory[1] -= daily_sales[i][1];
+        inventory[2] -= daily_sales[i][2];
+        inventory[3] -= daily_sales[i][3];
+        inventory[4] -= daily_sales[i][3];
+    }
+    for (int i = 0; i < 5; i++){
+        remaining[i] = inventory[i];
+        if (remaining[i] <= 0){
+            remaining[i] = 0;
+        }
+    }
     
     
     printf("Remaining Inventory:\n");
@@ -88,7 +101,7 @@ int main() {
         printf("%s: %d units remaining\n", products[i], remaining[i]);
     }
     printf("\n");
-    /*
+    
     // PART 4: Find the best and worst selling products
     int best_product = 0;
     int worst_product = 0;
@@ -96,16 +109,33 @@ int main() {
     // TODO: Find which product sold the most units (best seller)
     // TODO: Find which product sold the least units (worst seller)
     
+    for (int i = 0; i < 5; i++){        
+        if (total_sales[i] >= total_sales[0] && total_sales[i] >= total_sales[1] &&
+            total_sales[i] >= total_sales[2] && total_sales[i] >= total_sales[3] &&
+            total_sales[i] >= total_sales[4]){
+            best_product = i;
+            }
+            if (total_sales[i] <= total_sales[0] && total_sales[i] <= total_sales[1] &&
+            total_sales[i] <= total_sales[2] && total_sales[i] <= total_sales[3] &&
+            total_sales[i] <= total_sales[4]){
+            best_product = i;
+            }
+    }
     
     
     printf("Best Seller: %s (%d units)\n", products[best_product], total_sales[best_product]);
     printf("Worst Seller: %s (%d units)\n\n", products[worst_product], total_sales[worst_product]);
     
     // PART 5: Calculate daily revenue (money earned each day)
-    int daily_revenue[7];
+    int daily_revenue[7]= {0};
     
     // TODO: For each day, calculate revenue = sum of (sales * price) for all products
     
+    for (int i = 0; i < 7; i++){
+        for (int j = 0; j < 5; j++){
+            daily_revenue[i] += daily_sales[i][j] * prices[j];
+        }
+    }
     
     
     printf("Daily Revenue:\n");
@@ -115,10 +145,19 @@ int main() {
     printf("\n");
     
     // PART 6: Find the most profitable day
-    in                                                                                                                                                                                                                                                                                                                                                                                                                  t best_day = 0;
+    int best_day = 0;
     
     // TODO: Find which day had the highest revenue
     
+    for (int i = 0; i < 7; i++){
+        for (int j = 0; j < 5; j++){
+            if (daily_revenue[i] >= daily_revenue[0] && daily_revenue[i] >= daily_revenue[1] &&
+            daily_revenue[i] >= daily_revenue[2] && daily_revenue[i] >= daily_revenue[3] &&
+            daily_revenue[i] >= daily_revenue[4]){
+                best_day = i;
+            }
+        }
+    }
     
     
     printf("Most Profitable Day: %s ($%d)\n\n", days[best_day], daily_revenue[best_day]);
@@ -128,17 +167,27 @@ int main() {
     
     printf("Restock Alerts:\n");
     int restock_needed = 0;
-    
+    int temp = 0;
     // TODO: Check each product's remaining inventory
     // If remaining < 5, print a restock alert for that product
     // Count how many products need restocking
     
+    for (int i = 0; i < 5; i++){
+        if (remaining[i] < 5){
+            while (temp != 5){
+                temp++;
+            }
+            restock_needed += temp;
+            printf("\nRequired stocks for %s:%d", products[i], temp);
+            temp = 0;//reset       
+        }
+    }
     
     
     if(restock_needed == 0) {
         printf("No restocking needed!\n");
     } else {
-        printf("Total products needing restock: %d\n", restock_needed);
+        printf("\nTotal products needing restock: %d\n", restock_needed);
     }
     printf("\n");
     
@@ -148,6 +197,13 @@ int main() {
     
     // TODO: Calculate total revenue for the entire week
     // TODO: Calculate total units sold across all products
+    
+    for (int i = 0; i < 7; i++){
+        total_weekly_revenue += daily_revenue[i];
+        for (int j = 0; j < 5; j++){
+            total_units_sold += daily_sales[i][j];
+        }
+    }
     
     
     
@@ -163,6 +219,6 @@ int main() {
         printf("\nERROR: Check your calculations.\n");
     }
     
-    */
+    
     return 0;
 }
