@@ -1,27 +1,41 @@
 #include <stdio.h>
 
-//PLAN, make loops for odds and even or maybe if statements for odds and even, maybe check if its at the odd row and even
-//row. Basically if else if else statement kinda
-int zigzagFlatten(char arr[][4]);
-int zigzagFlatten(char arr[][4]){
-    int i= 0; //    counter/checker
-//    if (arr[i] == sizeArr){
-        return;
-  //  }
-    
+int zigzagFlatten(int arr[][4], int *row, int *i, int leftToRight) {
+    if (*row >= 3) return 0;  
+
+    printf("%d ", arr[*row][*i]);
+
+    if (leftToRight) {
+        if (*i < 3) {
+            (*i)++;
+        } else {
+            (*row)++;
+            *i = 3;   
+            leftToRight = 0;
+        }
+    } else {  
+        if (*i > 0) {
+            (*i)--;
+        } else {
+            (*row)++;
+            *i = 0;   
+            leftToRight = 1;
+        }
+    }
+
+    return zigzagFlatten(arr, row, i, leftToRight);
 }
 
+int main() {
+    int arr[][4] = {
+        {1, 2, 3, 4},
+        {5, 6, 7, 8},
+        {9, 10, 11, 12}
+    };
 
-int main(){
-    int arr[][4] = {{1,2,3,4}, {5,6,7,8}, {9,10,11,12}};
-    int sizeArr = sizeof(arr)/sizeof(arr[1]);
+    int row = 0, i = 0;
 
-    //zigzagFlatten(arr);
-    //sizearr * 4 because there is 4 elements
-    for (int i = 0; i < sizeArr * 4; i++){
-        printf("");
-    }
-    
+    zigzagFlatten(arr, &row, &i, 1);  
 
     return 0;
 }
