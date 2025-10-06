@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-
+#include <ctype.h>
 // strlen(str) → Returns the length of a string (excluding \0).
 // strcpy(dest, src) → Copies src into dest.
 // strncpy(dest, src, n) → Copies first n chars of src into dest.
@@ -23,6 +23,7 @@ int main() {
     char str3[50];
     char str4[50] = "Hello World!";
     char buffer[50];
+
 
     // 1. strlen
     printf("Length of str1: %zu\n", strlen(str1));
