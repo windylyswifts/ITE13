@@ -31,7 +31,7 @@ int main() {
     addStudent(&studentCount, account);
     menu(&studentCount, &account);
 
-    free(account);
+    free(account);  
     return 0;
 }
 
