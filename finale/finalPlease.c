@@ -16,8 +16,9 @@ struct Hotel{
     char name[MAXSIZE];
     int occupation;
 };
-
 void ADD(struct Hotel *rooms, int *n){
+    //couldn't find the bug that was distrupting this functions so i added getchar
+    getchar();
     //old is used here marks as the starting point for each adding
     for (int i = old; i < *n; i++){
         printf("Room Number %d\n", i+1);
@@ -39,10 +40,11 @@ void ADD(struct Hotel *rooms, int *n){
             scanf("%d", &rooms[i].occupation);
         }
         //becuse the next is fgets
-        getchar();
+        getchar();        
     }
 
     old = *n;
+
 }
 
 void VIEW(struct Hotel *rooms, int *n){
@@ -120,6 +122,7 @@ void EDIT(struct Hotel *rooms, int *n){
             return;
         }
     }
+
 }
 
 void VACANT(struct Hotel *rooms, int *n){
@@ -174,6 +177,7 @@ void BOOK(struct Hotel *rooms, int *n){
 void DELETE(struct Hotel *rooms, int *n){
     int findRoom, tempINT = 0;
     char tempCHAR[MAXSIZE];
+    float tempFLOAT = 0;
     printf("Note that this will PERMANENTLY remove the data\n");
     printf("What is the room code for this?: ");
     scanf("%d", &findRoom);
@@ -181,23 +185,100 @@ void DELETE(struct Hotel *rooms, int *n){
         if (findRoom == rooms[i].roomCode){
             printf("Found room code\n");
             for (int j = i; j < (i - (1 - *n)); j++){ //its 1 - *n because we want to leave the last open
+                //simply bubble sorting
                 tempINT = rooms[j].roomCode;
                 rooms[j].roomCode = rooms[j+1].roomCode;
                 rooms[j+1].roomCode = tempINT;
-
+                //reset 
                 tempINT = 0;
-                //updater for old so that by the end of this there is an empty space that the user can input
-                //i think its likely that there should be a conditioning inside of ADD
-                //i think we need to remove the increased size and put it as a system in ADD
+                tempINT = rooms[j].beds;
+                rooms[j].beds = rooms[j+1].beds;
+                rooms[j+1].beds = tempINT;
+                tempINT = 0;
+
+                tempINT = rooms[j].occupation;
+                rooms[j].occupation = rooms[j+1].occupation;
+                rooms[j+1].occupation = tempINT;
+                tempINT = 0;
+
+                tempFLOAT = rooms[j].price;
+                rooms[j].price = rooms[j+1].price;
+                rooms[j+1].price = tempFLOAT;
+                tempFLOAT = 0;
+
+                strcpy(tempCHAR, rooms[j].name);
+                strcpy(rooms[j].name, rooms[j+1].name);
+                strcpy(rooms[j+1].name, tempCHAR);
+
                 
-                //because there is a free index that must be used whenever the user wants to add another room
-                old--;
             }
+            //this is important because if we use "VIEW" function it doesn't show random stuff
+            (*n)--;
+            //because there is a free index that must be used whenever the user wants to add another room
+            old--;
             return;
         }
     }
 }
 
+void SAVE(struct Hotel *rooms, int *n){
+    //everything will overwrite
+    FILE *ptr = fopen("HotelList_rooms.txt", "w");
+    for (int i = 0; i < *n; i++){
+        fprintf(ptr, "Name of the room: %s\n", rooms[i].name);
+        fprintf(ptr, "Room code: %d\n", rooms[i].roomCode);
+        fprintf(ptr, "Beds: %d\n", rooms[i].beds);
+        fprintf(ptr, "price: %f\n", rooms[i].price);
+        fprintf(ptr, "Occupation: %d\n", rooms[i].occupation);
+        fprintf(ptr, "\n");
+    }
+    //we need this for resuming
+    fprintf(ptr,"n: %d", *n);
+    fclose(ptr);
+}
+
+void RESUME(struct Hotel *rooms){
+    char BUFFER[MAXBUFFER];
+    //we can get all of this information from "SAVE" function
+    int nameSize = strlen("Name of the room: ");
+    int roomCodeSize = strlen("Room code: ");
+    int bedSize = strlen("Beds: ");
+    int priceSize = strlen("price: ");
+    int occupationSize = strlen("Occupation: ");
+    //this is for the index
+    int i = 0;
+
+    FILE *ptr = fopen("HotelList_rooms.txt", "r");
+    if (ptr == NULL ){
+        printf("THERE WAS SOMETHING WRONG INSIDE OF RESUME VARIABLE");
+        exit(1);
+    }
+
+    while (fgets(BUFFER, MAXBUFFER, ptr)){
+        if (strstr(BUFFER, "Name of the room: ")){
+            //this works because buffer stats with index 0 and avoids all characters of nameSize
+            char *temp = BUFFER + nameSize;//We need a temp to tansfer this to rooms
+            strcpy(rooms[i].name, temp);
+            rooms[i].name[strcspn(rooms[i].name, "\n")] = '\0';
+        }
+        if (strstr(BUFFER, "Room code: ")){
+            rooms[i].roomCode = atoi(BUFFER + roomCodeSize);
+        }
+        if (strstr(BUFFER, "Beds: ")){
+            rooms[i].beds = atoi(BUFFER + bedSize);
+        }
+        if (strstr(BUFFER, "price: ")){
+            rooms[i].price = atoi(BUFFER + priceSize);
+        }
+        if (strstr(BUFFER, "Occupation: ")){
+            rooms[i].occupation = atoi(BUFFER + occupationSize);
+            //this is where we increment i because in the file or the "SAVE" function it ends at occupation
+            i++;
+        }
+    }
+
+    fclose(ptr);
+}
 struct Hotel* REALLOC(struct Hotel *rooms, int newN, int *n){
     struct Hotel *temp = realloc(rooms, newN * sizeof(struct Hotel));
     *n = newN;
@@ -206,17 +287,37 @@ struct Hotel* REALLOC(struct Hotel *rooms, int newN, int *n){
 
 int main(){
     int n, choice, checker, newN;
+    char BUFFER[MAXBUFFER];
+    struct Hotel *rooms;
     printf("WELCOME TO THE ROOM BOOKING SYSTEM\n");
-    printf("How many rooms do you know?");
-    scanf("%d", &n);
-
-    //mallocating for the rooms using the varaible n as the size
-    struct Hotel *rooms = malloc(n * sizeof(struct Hotel));
-    if (rooms == NULL){
-        printf("There was a problem When Mallocating");
-        return 1;
+    //checking if the file already has existing data
+    FILE *ptr = fopen("HotelList_rooms.txt", "r");
+    if (ptr == NULL){
+        printf("How many rooms do you know?");
+        scanf("%d", &n);
+        getchar();
+        //mallocating for the rooms using the varaible n as the size
+        rooms = malloc(n * sizeof(struct Hotel));
+        if (rooms == NULL){
+            printf("There was a problem When Mallocating");
+            return 1;
+        }
     }
-    
+    else{ //this is the part where the program resume where it left off
+        //this is only my calculation but i wanted to get n first to create size of the "room"
+        int sizeN = strlen("n: "); // we can find "n: " from the SAVE function
+        while (fgets(BUFFER, MAXBUFFER, ptr) != NULL){
+            if (strstr(BUFFER, "n: ")){
+                n = atoi(BUFFER + sizeN);
+            }
+        }
+        old = n;
+        rooms = malloc(n * sizeof(struct Hotel));
+        RESUME(rooms);
+    }
+    //to be efficient and not slowing down the user's runtime 
+    fclose(ptr);
+
     do{
         printf("=========MENU=========\n");
         printf("[1] ADD ROOMS\n");
@@ -225,10 +326,7 @@ int main(){
         printf("[4] Vacant ROOM\n");
         printf("[5] BOOK A ROOM\n");
         printf("[6] DELETE INFO\n");
-        printf("[7] SAVE\n");
-        printf("[8] RESUME\n");
-        printf("[9] DataFinder(Only when there is an existing data in the file)\n");
-        printf("[10] EXIT\n");
+        printf("[7] EXIT\n");
         
         scanf("%d", &choice);
         //its best to getchar here because we are calling functions and some may start with fgets so better
@@ -245,43 +343,45 @@ int main(){
                 if (checker == 1){
                     printf("How much do you want to add?: ");
                     scanf("%d", &newN);
-
+                    //because we need to make it bigger than n
                     newN += n;
 
                     rooms = REALLOC(rooms, newN, &n);
                     ADD(rooms, &n);
+                    SAVE(rooms, &n);
                 }
             }
             else
                 ADD(rooms, &n);
+                SAVE(rooms, &n);
             break;
         case 2:
             VIEW(rooms, &n);
             break;
         case 3:
             EDIT(rooms, &n);
+            SAVE(rooms, &n);
             break;
         case 4:
             VACANT(rooms, &n);
             break;
         case 5:
             BOOK(rooms, &n);
+            SAVE(rooms, &n);
             break;
         case 6:
             DELETE(rooms, &n);
+            SAVE(rooms, &n);
             break;
         case 7:
-            
+            printf("Thank you for using my system");
             break;
-        
         default:
             break;
         }
 
-    } while (choice != 10);
+    } while (choice != 7);
     
-
-
     free(rooms);
     return 0;
 }
