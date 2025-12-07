@@ -17,9 +17,9 @@ struct Hotel{
     int occupation;
 };
 
-void ADD(struct Hotel *rooms, int n){
+void ADD(struct Hotel *rooms, int *n){
     //old is used here marks as the starting point for each adding
-    for (int i = old; i < n; i++){
+    for (int i = old; i < *n; i++){
         printf("Room Number %d\n", i+1);
         printf("What is the name of the room?:");
         fgets(rooms[i].name, MAXSIZE, stdin);
@@ -41,10 +41,12 @@ void ADD(struct Hotel *rooms, int n){
         //becuse the next is fgets
         getchar();
     }
+
+    old = *n;
 }
 
-void VIEW(struct Hotel *rooms, int n){
-    for (int i = 0; i < n; i++){
+void VIEW(struct Hotel *rooms, int *n){
+    for (int i = 0; i < *n; i++){
         printf("\n\n========================================\n");
         printf("Room Number %d\n", i+1);
         printf("Room Code %d\n", rooms[i].roomCode);
@@ -62,11 +64,11 @@ void VIEW(struct Hotel *rooms, int n){
     printf("\n\n========================================\n");
 }
 
-void EDIT(struct Hotel *rooms, int n){
+void EDIT(struct Hotel *rooms, int *n){
     int temp, choice;
     printf("What is the room code your trying to find?: ");
     scanf("%d", &temp);
-    for(int i = 0; i < n; i++){
+    for(int i = 0; i < *n; i++){
         //this way we can find the index just by finding the ID or roomCode
         if (temp == rooms[i].roomCode){
             printf("Found Room!\n");
@@ -120,8 +122,8 @@ void EDIT(struct Hotel *rooms, int n){
     }
 }
 
-void VACANT(struct Hotel *rooms, int n){
-    for (int i = 0; i < n; i++){
+void VACANT(struct Hotel *rooms, int *n){
+    for (int i = 0; i < *n; i++){
         if (rooms[i].occupation == 0){
             printf("\n\n========================\n");
             printf("Vacant Room number %d:\n", i+1);
@@ -134,13 +136,13 @@ void VACANT(struct Hotel *rooms, int n){
     }
 }
 
-void BOOK(struct Hotel *rooms, int n){
+void BOOK(struct Hotel *rooms, int *n){
     int choice,booking, checker = 0;
     printf("Enter the Room Code that you want to book for today: ");
     scanf("%d", &booking);
 
     do{
-        for (int i = 0; i < n; i++){
+        for (int i = 0; i < *n; i++){
             if (booking == rooms[i].roomCode && rooms[i].occupation== 0){
                 printf("\nFound Room and booked succesfully!\n");
                 rooms[i].occupation = 1;
@@ -169,16 +171,16 @@ void BOOK(struct Hotel *rooms, int n){
     } while (checker == 0);
 }
 
-void DELETE(struct Hotel *rooms, int n){
+void DELETE(struct Hotel *rooms, int *n){
     int findRoom, tempINT = 0;
     char tempCHAR[MAXSIZE];
     printf("Note that this will PERMANENTLY remove the data\n");
     printf("What is the room code for this?: ");
     scanf("%d", &findRoom);
-    for (int i = 0; i < n; i++){
+    for (int i = 0; i < *n; i++){
         if (findRoom == rooms[i].roomCode){
             printf("Found room code\n");
-            for (int j = i; j < (i - (1 - n)); j++){
+            for (int j = i; j < (i - (1 - *n)); j++){ //its 1 - *n because we want to leave the last open
                 tempINT = rooms[j].roomCode;
                 rooms[j].roomCode = rooms[j+1].roomCode;
                 rooms[j+1].roomCode = tempINT;
@@ -188,15 +190,22 @@ void DELETE(struct Hotel *rooms, int n){
                 //i think its likely that there should be a conditioning inside of ADD
                 //i think we need to remove the increased size and put it as a system in ADD
                 
-
+                //because there is a free index that must be used whenever the user wants to add another room
+                old--;
             }
             return;
         }
     }
 }
 
+struct Hotel* REALLOC(struct Hotel *rooms, int newN, int *n){
+    struct Hotel *temp = realloc(rooms, newN * sizeof(struct Hotel));
+    *n = newN;
+    return temp;
+}
+
 int main(){
-    int n, choice;
+    int n, choice, checker, newN;
     printf("WELCOME TO THE ROOM BOOKING SYSTEM\n");
     printf("How many rooms do you know?");
     scanf("%d", &n);
@@ -216,10 +225,10 @@ int main(){
         printf("[4] Vacant ROOM\n");
         printf("[5] BOOK A ROOM\n");
         printf("[6] DELETE INFO\n");
-        printf("[7] Increase Rooms\n");
-        printf("[8] SAVE\n");
-        printf("[9] RESUME\n");
-        printf("[10] DataFinder(Only when there is an existing data in the file)\n");
+        printf("[7] SAVE\n");
+        printf("[8] RESUME\n");
+        printf("[9] DataFinder(Only when there is an existing data in the file)\n");
+        printf("[10] EXIT\n");
         
         scanf("%d", &choice);
         //its best to getchar here because we are calling functions and some may start with fgets so better
@@ -228,31 +237,48 @@ int main(){
 
         switch (choice){
         case 1:
-            ADD(rooms, n);
+            if (old == n){
+                do{
+                    printf("It seems that you're list is full. Do you want to add more rooms?[1] for yes [0] for no: ");
+                    scanf("%d", &checker);
+                } while (checker != 0 && checker != 1);
+                if (checker == 1){
+                    printf("How much do you want to add?: ");
+                    scanf("%d", &newN);
+
+                    newN += n;
+
+                    rooms = REALLOC(rooms, newN, &n);
+                    ADD(rooms, &n);
+                }
+            }
+            else
+                ADD(rooms, &n);
             break;
         case 2:
-            VIEW(rooms, n);
+            VIEW(rooms, &n);
             break;
         case 3:
-            EDIT(rooms, n);
+            EDIT(rooms, &n);
             break;
         case 4:
-            VACANT(rooms, n);
+            VACANT(rooms, &n);
             break;
         case 5:
-            BOOK(rooms, n);
+            BOOK(rooms, &n);
             break;
         case 6:
-            DELDTE(rooms, n);
+            DELETE(rooms, &n);
             break;
         case 7:
+            
             break;
         
         default:
             break;
         }
 
-    } while (choice != 11);
+    } while (choice != 10);
     
 
 
