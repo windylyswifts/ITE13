@@ -1,31 +1,25 @@
 Name of the room: isiah
-Room code: 1222
-Beds: 122
-price: 22222.000000
+Room code: 12
+Beds: 1231
+price: 122.000000
 Occupation: 0
 
-Name of the room: 
-Room code: 1
-Beds: 1
-price: 1.000000
+Name of the room: doro
+Room code: 11
+Beds: 122
+price: 0.000000
 Occupation: 1
 
-Name of the room: 1
-Room code: 1
-Beds: 1
-price: 1.000000
+Name of the room: jelai
+Room code: 12
+Beds: 12
+price: 1222.000000
+Occupation: 0
+
+Name of the room: plopsons
+Room code: 1222
+Beds: 1222
+price: 3231.100098
 Occupation: 1
 
-Name of the room: plopls
-Room code: 1231
-Beds: 1
-price: 1.000000
-Occupation: 1
-
-Name of the room: isiah
-Room code: 2
-Beds: 2
-price: 1.000000
-Occupation: 1
-
-n: 5
+n: 4
