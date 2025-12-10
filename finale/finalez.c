@@ -286,6 +286,7 @@ void RESUME(struct Hotel *rooms){
 
     fclose(ptr);
 }
+
 struct Hotel* REALLOC(struct Hotel *rooms, int newN, int *n){
     struct Hotel *temp = realloc(rooms, newN * sizeof(struct Hotel));
     *n = newN;
@@ -310,6 +311,7 @@ int main(){
             return 1;
         }
     }
+    
     else{ //this is the part where the program resume where it left off
         //this is only my calculation but i wanted to get n first to create size of the "room"
         int sizeN = strlen("n: "); // we can find "n: " from the SAVE function
