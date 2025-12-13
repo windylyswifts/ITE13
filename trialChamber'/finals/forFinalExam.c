@@ -34,6 +34,59 @@ void ADD(shop *bartender, int *n){
     old = *n;
 }
 
+void EDIT(shop *bartender, int *n){
+    int temp, choice;
+    printf("Enter the Liquor Code: ");
+    scanf("%d", &temp);
+    for (int i = 0; i < *n; i++){
+        if (temp == bartender[i].liquorCode){
+            printf("Found Liquor!\n");
+            do{
+                printf("Liquor name:%s\n", bartender[i].name);
+                printf("Liquor Count:%d\n", bartender[i].liquors);
+                printf("Liquor Code:%d\n", bartender[i].liquorCode);
+                printf("Liquor price:%.2f\n", bartender[i].price);
+                
+                printf("What do you wish to change?\n");
+                printf("[1] Name\n");
+                printf("[2] Quantity\n");
+                printf("[3] Liquor Code\n");
+                printf("[4] Liquor Price\n");
+                printf("[5] EXIT\n");
+                
+                scanf("%d", &choice);
+                getchar();
+
+                switch (choice){
+                case 1:
+                    printf("What is the new name:");
+                    fgets(bartender[i].name, MAXSIZE, stdin);
+                    break;
+                case 2:
+                    printf("What is the new Quantity?: ");
+                    scanf("%d", bartender[i].liquors);
+                    break;
+                case 3:
+                    printf("What is the new Liquor Code?: ");
+                    scanf("%d", bartender[i].liquorCode);
+                    break;
+                case 4:
+                    printf("What is the new Liquor Price?: ");
+                    scanf("%f", bartender[i].price);
+                    break;
+                case 5:
+                    printf("EDIT COMPLETE!");
+                    break;
+                default:
+                    break;
+                }
+            } while (choice != 5);
+        }
+    }
+    
+    
+
+}
 
 shop *REALLOC(shop *bartender, int *newN){
     shop *temp = realloc(bartender, *newN * sizeof(shop));
@@ -93,7 +146,7 @@ int main(){
             }
             break;
         case 2:
-            EDIT();
+            EDIT(choice, &n);
             break;
         // case 3:
         //     ADD();
