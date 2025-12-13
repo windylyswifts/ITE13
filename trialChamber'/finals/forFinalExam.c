@@ -88,6 +88,42 @@ void EDIT(shop *bartender, int *n){
 
 }
 
+void REMOVE(shop *bartender, int *n){
+    int elimate, temp;
+    char charTemp[MAXSIZE];
+    float floatTemp;
+    
+    printf("What do you wish to remove from the list");
+    scanf("%d", &elimate);
+    getchar();
+    for (int i = 0; i < *n; i++){
+        if (elimate == bartender[i].liquorCode){
+            printf("Found Liquor");
+            for (int j = i; j < (*n-1); j++){
+                strcpy(charTemp,bartender[j].name);
+                strcpy(bartender[j].name, bartender[j+1].name);
+                strcpy(bartender[j+1].name, charTemp);
+
+                temp = bartender[j].liquors;
+                bartender[j].liquors = bartender[j+1].liquors;
+                bartender[j+1].liquors = temp;
+
+                temp = bartender[j].liquorCode;
+                bartender[j].liquorCode = bartender[j+1].liquorCode;
+                bartender[j+1].liquorCode = temp;
+                
+                floatTemp = bartender[j].price;
+                bartender[j].price = bartender[j+1].price;
+                bartender[j+1].price = floatTemp;
+            }
+            printf("Removed Succesfully\n");
+            //because we reduced the list
+            old--;
+            *n--;
+        }
+    }
+}
+
 shop *REALLOC(shop *bartender, int *newN){
     shop *temp = realloc(bartender, *newN * sizeof(shop));
     return temp;
@@ -148,9 +184,9 @@ int main(){
         case 2:
             EDIT(choice, &n);
             break;
-        // case 3:
-        //     ADD();
-        //     break;
+        case 3:
+            REMOVE(choice, &n);
+            break;
         // case 4:
         //     ADD();
         //     break;
