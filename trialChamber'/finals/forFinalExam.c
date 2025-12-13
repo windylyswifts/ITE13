@@ -35,9 +35,13 @@ void ADD(shop *bartender, int *n){
 }
 
 
+shop *REALLOC(shop *bartender, int *newN){
+    shop *temp = realloc(bartender, *newN * sizeof(shop));
+    return temp;
+}
 
 int main(){
-    int n, choice;
+    int n, choice, newN, detector;
     printf("how much liqour");
     scanf("%d", &n);
     getchar();
@@ -61,11 +65,36 @@ int main(){
         
         switch (choice){
         case 1:
-            ADD(choice, &n);
+            if (old == n){
+                printf("It seems that you want to add more. do you wish to continue?[1] for yes [0] for no: ");
+                scanf("%d", &detector);
+                if (detector != 0 && detector != 1){
+                    while (detector != 0 && detector != 1){
+                        printf("Wrong input!\n");
+                        printf("It seems that you want to add more. do you wish to continue?[1] for yes [0] for no: ");
+                        scanf("%d", &detector);
+                        getchar();
+                    }
+                }
+                if (detector == 1){
+                    printf("How much do you want to add?: ");
+                    scanf("%d", &newN);
+                    newN += n;
+    
+                    bartender = REALLOC(bartender, &newN);
+                    ADD(choice, &n);
+                }
+                else{
+                    break;
+                }
+            }
+            else{
+                ADD(choice, &n);
+            }
             break;
-        // case 2:
-        //     ADD();
-        //     break;
+        case 2:
+            EDIT();
+            break;
         // case 3:
         //     ADD();
         //     break;
